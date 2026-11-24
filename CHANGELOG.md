@@ -8,6 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- 2026-11-24: [Spec: shoot one Roll](docs/specs/2026-11-24-shoot-one-roll-design.md), the first slice (one Camera, one Film, 36 Exposures), with [ADR 0005](docs/adr/0005-native-android.md) (native Android, Kotlin and CameraX) and [ADR 0006](docs/adr/0006-develop-on-the-gpu-after-capture.md) (plain viewfinder, develop on the GPU after capture).
 - 2026-11-24: [ADR 0004](docs/adr/0004-model-per-workflow-phase.md): brainstorming runs on Opus 5.5 and plan writing on Sonnet 5.5; rule added to `CLAUDE.md` under "Which model to use".
 - 2026-11-23: Git repository on `main` with a `.gitignore`, `README.md`, `CLAUDE.md` working rules (changelog, ADRs, git rules), and `docs/specs`, `docs/plans`, `docs/business-rules` folders.
 - 2026-11-23: [ADR 0003](docs/adr/0003-issue-and-pr-per-task.md): one GitHub issue and one PR per plan task.
