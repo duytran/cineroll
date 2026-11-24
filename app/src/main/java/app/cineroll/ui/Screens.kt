@@ -20,12 +20,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -122,7 +124,10 @@ private fun FinishedRollScreen(onLoadNewRoll: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text("This Roll is finished.")
-        Button(onClick = onLoadNewRoll, modifier = Modifier.padding(top = 24.dp)) { Text("Load new Roll") }
+        Button(
+            onClick = onLoadNewRoll,
+            modifier = Modifier.padding(top = 24.dp).testTag("load-new-roll"),
+        ) { Text("Load new Roll") }
     }
 }
 
@@ -134,6 +139,7 @@ private fun ViewfinderScreen(viewModel: ShootViewModel) {
     val busy by viewModel.shutter.busy.collectAsState()
     val message by viewModel.message.collectAsState()
     val snackbar = remember { SnackbarHostState() }
+    var confirmingRewind by remember { mutableStateOf(false) }
 
     LaunchedEffect(message) {
         message?.let {
@@ -150,17 +156,42 @@ private fun ViewfinderScreen(viewModel: ShootViewModel) {
                     PreviewView(ctx).also { bindCamera(ctx, lifecycleOwner, it, viewModel.capturer) }
                 },
             )
-            Text(
-                text = "${roll.left}/${roll.total}",
-                color = Color.White,
-                modifier = Modifier.align(Alignment.TopCenter).padding(16.dp).testTag("counter"),
-            )
+            Column(
+                modifier = Modifier.align(Alignment.TopCenter).padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(text = roll.film.name, color = Color.White, modifier = Modifier.testTag("film-name"))
+                Text(text = "${roll.left}/${roll.total}", color = Color.White, modifier = Modifier.testTag("counter"))
+            }
+            Button(
+                onClick = { confirmingRewind = true },
+                enabled = !busy,
+                modifier = Modifier.align(Alignment.BottomStart).padding(32.dp).testTag("rewind"),
+            ) { Text("Rewind") }
             Button(
                 onClick = viewModel::shoot,
                 enabled = !busy,
                 modifier = Modifier.align(Alignment.BottomCenter).padding(32.dp).testTag("shutter"),
             ) { Text("Shoot") }
         }
+    }
+
+    if (confirmingRewind) {
+        AlertDialog(
+            onDismissRequest = { confirmingRewind = false },
+            title = { Text("Rewind?") },
+            text = { Text(rewindWarning(roll.left)) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        confirmingRewind = false
+                        viewModel.rewind()
+                    },
+                    modifier = Modifier.testTag("rewind-confirm"),
+                ) { Text("Rewind") }
+            },
+            dismissButton = { TextButton(onClick = { confirmingRewind = false }) { Text("Cancel") } },
+        )
     }
 }
 
@@ -182,3 +213,7 @@ private fun bindCamera(
         capturer.bind(imageCapture)
     }, ContextCompat.getMainExecutor(context))
 }
+
+/** What the Rewind dialog says will be lost. */
+internal fun rewindWarning(left: Int): String =
+    if (left == 1) "The 1 Exposure left will be lost." else "The $left Exposures left will be lost."

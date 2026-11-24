@@ -1052,7 +1052,6 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodes
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
@@ -1244,4 +1243,4 @@ git commit -m "feat: add Rewind and show the Film name in the viewfinder"
 
 ## Revisions
 
-*(None yet. Record here, with the date, any change made against this plan while building it.)*
+- 2026-11-24: Task 4's smoke test imported `androidx.compose.ui.test.onAllNodes`, which does not exist: `onAllNodes` is a method of the compose test rule (`compose.onAllNodes(...)`), so the import was removed from the test code in Task 4, Step 1. Nothing else in Tasks 1 to 4 needed a change to the plan's code.
