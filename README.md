@@ -4,7 +4,7 @@ A camera app that makes phone photos look like they were shot on film. You load 
 
 ## Status
 
-Design stage. No app code yet; the domain language and first decisions are written down.
+First slice built: shoot one Roll of 36 Exposures on a 35mm Camera with one Film. See [`docs/specs/2026-11-24-shoot-one-roll-design.md`](docs/specs/2026-11-24-shoot-one-roll-design.md). Android only; open the folder in Android Studio and run the `app` module.
 
 ## Docs
 
