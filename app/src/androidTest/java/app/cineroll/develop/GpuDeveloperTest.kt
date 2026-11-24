@@ -68,6 +68,29 @@ class GpuDeveloperTest {
     }
 
     @Test
+    fun monoFilmMatchesTheFilmMathAndHasNoColour() {
+        val mono = Films.Mono400.copy(grain = 0f)
+        val input = fourColourJpeg()
+        val inputBitmap = decode(input)
+        val output = decode(developer.develop(CapturedImage(input, 0), mono))
+
+        for ((x, y) in listOf(16 to 16, 48 to 16, 16 to 48, 48 to 48)) {
+            val src = inputBitmap.getPixel(x, y)
+            val expected = FilmMath.develop(
+                floatArrayOf(Color.red(src) / 255f, Color.green(src) / 255f, Color.blue(src) / 255f),
+                mono,
+            )
+            val got = output.getPixel(x, y)
+            assertNear(expected[0] * 255f, Color.red(got), "red at $x,$y")
+            assertNear(expected[1] * 255f, Color.green(got), "green at $x,$y")
+            assertNear(expected[2] * 255f, Color.blue(got), "blue at $x,$y")
+            // R = G = B, give or take 2 for the JPEG round trip.
+            assertTrue("grey at $x,$y", abs(Color.red(got) - Color.green(got)) <= 2)
+            assertTrue("grey at $x,$y", abs(Color.green(got) - Color.blue(got)) <= 2)
+        }
+    }
+
+    @Test
     fun appliesTheCaptureRotation() {
         val input = fourColourJpeg(width = 64, height = 32)
         val output = decode(developer.develop(CapturedImage(input, 90), noGrain))

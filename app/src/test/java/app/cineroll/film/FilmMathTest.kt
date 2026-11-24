@@ -6,7 +6,7 @@ import org.junit.Test
 
 class FilmMathTest {
 
-    private val neutral = Film("neutral", 1f, 1f, 1f, 1f, 1f, 0f, 0f)
+    private val neutral = Film("neutral", "Changes nothing.", 1f, 1f, 1f, 1f, 1f, 0f, 0f)
 
     @Test
     fun neutralFilmLeavesColoursAlone() {
