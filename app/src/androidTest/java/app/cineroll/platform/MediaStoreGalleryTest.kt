@@ -32,7 +32,7 @@ class MediaStoreGalleryTest {
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             arrayOf(MediaStore.Images.Media._ID),
             "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?",
-            arrayOf("Pictures/Cineroll/%"),
+            arrayOf("DCIM/Cineroll/%"),
             null,
         )?.use { cursor ->
             while (cursor.moveToNext()) ids += cursor.getLong(0)
@@ -70,7 +70,7 @@ class MediaStoreGalleryTest {
     }
 
     @Test
-    fun savesTheJpegIntoThePicturesCineRollAlbum() {
+    fun savesTheJpegIntoTheDcimCineRollAlbum() {
         val before = cineRollImageIds()
 
         MediaStoreGallery(context).save(smallJpeg())

@@ -14,7 +14,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-/** Saves developed Exposures to `Pictures/Cineroll`. Needs no storage permission on Android 10+. */
+/** Saves developed Exposures to `DCIM/Cineroll`. Needs no storage permission on Android 10+. */
 class MediaStoreGallery(
     private val context: Context,
     private val now: () -> Long = System::currentTimeMillis,
@@ -27,7 +27,7 @@ class MediaStoreGallery(
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "CINEROLL_$stamp.jpg")
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Cineroll")
+            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_DCIM + "/Cineroll")
             put(MediaStore.Images.Media.IS_PENDING, 1)
         }
         val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
