@@ -15,3 +15,10 @@ local.properties
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Android and Gradle
+.gradle/
+build/
+*.iml
+.cxx/
+captures/
