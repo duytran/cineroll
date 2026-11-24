@@ -77,3 +77,4 @@ CameraX and `MediaStore` themselves are not unit tested.
 ## Revisions
 
 - 2026-11-24: The UI smoke test said the counter goes `0/36` to `1/36`, which contradicted the assumption that the counter shows Exposures left (`23/36`). Corrected to `36/36` to `35/36`. A new Roll shows `36/36`.
+- 2026-11-24: In Testing, the `Developer` golden image became a sample-pixel check against `FilmMath` (the CPU reference of the Film look), with grain off, plus tests for rotation, deterministic grain and a bad JPEG. Same intent (the Film look is pinned), no binary golden file in git. See the [plan](../plans/2026-11-24-shoot-one-roll.md), Task 3.
