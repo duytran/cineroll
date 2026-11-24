@@ -53,11 +53,17 @@ private class FakeGallery : Gallery {
 
 private class FakeStore : RollStore {
     var failure: IOException? = null
+    var cleared = 0
     val saved = mutableListOf<Roll>()
     override fun load(): Roll? = saved.lastOrNull()
     override fun save(roll: Roll) {
         failure?.let { throw it }
         saved += roll
+    }
+    override fun clear() {
+        failure?.let { throw it }
+        saved.clear()
+        cleared++
     }
 }
 
