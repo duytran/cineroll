@@ -8,6 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- 2026-11-24: [ADR 0003](docs/adr/0003-issue-and-pr-per-task.md) now says why stacked PRs must be merged into `main` in task order, and to check the issues afterwards. Before: "merge stacked PRs in task order; after merging one, retarget the next PR to `main` if GitHub did not." Why it changed: the choose-your-Film PRs #18 to #20 were merged top-down into their stacked base branches, so GitHub did not close issues #14 to #16 (it only does so for a merge into `main`); they were closed by hand. The rule already said "in task order", but not the reason or what to do after.
 - 2026-11-24: Moved the [shoot-one-Roll plan](docs/plans/2026-11-24-shoot-one-roll.md) and the [Android setup guide](docs/android-setup.md) from older build versions to current stable ones. Before: Android Gradle Plugin 8.7.3, Kotlin 2.0.21, Gradle 8.9, API 35, CameraX 1.4.1, Compose BOM 2024.10.01. Now: Android Gradle Plugin 9.5.0 with built-in Kotlin, Kotlin 2.4.21, Gradle 9.6.0, API 37, CameraX 1.7.0, Compose BOM 2026.11.01. Why: the installed Android Studio and SDK are newer, and the project's author runs the latest Android. Some points are not verified until Task 1 builds; see the plan's `Revisions`. No ADR changes: [ADR 0005](docs/adr/0005-native-android.md) names no versions.
 
 ### Added

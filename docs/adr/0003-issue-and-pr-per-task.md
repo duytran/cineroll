@@ -32,7 +32,8 @@ We open one GitHub issue per plan task before writing code, build each task on i
 - **Always** start task 1 from `main`; start a later task from the previous task's branch when it depends on it, otherwise from `main`. The PR's base is the branch you started from.
 - **Always** put `Closes #<issue>` in the PR body, plus the task's test plan with what was actually run.
 - **Always** commit review fixes for a task to that task's branch before its PR is merged — never into a later task.
-- **Always** merge stacked PRs in task order; after merging one, retarget the next PR to `main` if GitHub did not.
+- **Always** merge stacked PRs in task order, and only when the PR's base is `main`: after merging one, retarget the next PR to `main` if GitHub did not, then merge it. GitHub closes the issue named by `Closes #<issue>` only when the PR merges into the default branch; a PR merged into another task's branch leaves its issue open.
+- **Always** check that each task's issue is closed after the last merge, and close any that are still open by hand with a comment saying which PR did the work.
 - **Never** combine several plan tasks in one branch or PR.
 - **Never** open a PR for a task whose tests, typecheck and CHANGELOG entry are not done.
 
