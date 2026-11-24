@@ -8,6 +8,7 @@ A camera app that makes phone photos look like they were shot on film. You load 
 
 - `GLOSSARY.md` — the domain language (Film, Camera, Roll, Exposure…). Use its terms and avoid the ones it lists under _Avoid_.
 - `docs/adr/` — design decisions in force. Load the ADR that matches the area you touch before changing it.
+- `docs/roadmap.md` — the slices from here to a finished app, with what is done and what is next. Read it before starting a new slice.
 - `docs/specs/` — dated design specs.
 - `docs/plans/` — implementation plans.
 - `docs/business-rules/` — how pricing, stock, orders, billing and other business behaviour work today.
@@ -30,6 +31,7 @@ A camera app that makes phone photos look like they were shot on film. You load 
 - **ADRs state what is true now.** When a decision changes, edit its ADR in place, and write in the `CHANGELOG.md` entry what it said before and why it changed. Git keeps the old text.
 - **Specs and plans are dated snapshots.** For a later redesign, write a new dated file and link back to the earlier one. Small corrections go in a `Revisions` section at the bottom of the file, with the date.
 - **Do not delete specs or plans.** Mark them superseded, with a link to what replaced them.
+- **The roadmap shows the present.** Edit `docs/roadmap.md` in place when a slice starts or finishes; git and `CHANGELOG.md` hold its past.
 - **Business rules show the present.** They may be edited in place, since git and `CHANGELOG.md` hold their past.
 
 ## Git rules
