@@ -27,3 +27,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - 2026-11-22: `GLOSSARY.md` with the app's vocabulary: Film, Camera, Format, Lens, Roll, Finished Roll, Rewind, Diptych, Exposure, Contact Sheet.
 - 2026-11-22: ADR 0001: save only the developed Exposure, not the original.
 - 2026-11-22: ADR 0002: each Camera holds its own Roll.
+
+### Fixed
+
+- 2026-11-24: Saved Exposures had no date taken, because the developed JPEG carries no EXIF and Android's media provider takes the date from it when a file is published. `MediaStoreGallery` now writes the EXIF date taken (UTC, with an explicit offset) into the file before publishing it, so galleries can sort and group Exposures by date. Found on a real Pixel 9 Pro; the new `MediaStoreGalleryTest` case failed before the fix (date was `null`). The older test now checks that the stored file is still a readable JPEG of the same size, since the bytes now include EXIF. Setting only the `DATE_TAKEN` column, before or after publishing, did not stick. See [plan](docs/plans/2026-11-24-shoot-one-roll.md) Task 5.
