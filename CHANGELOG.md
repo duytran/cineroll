@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- 2026-11-24: Moved the [shoot-one-Roll plan](docs/plans/2026-11-24-shoot-one-roll.md) and the [Android setup guide](docs/android-setup.md) from older build versions to current stable ones. Before: Android Gradle Plugin 8.7.3, Kotlin 2.0.21, Gradle 8.9, API 35, CameraX 1.4.1, Compose BOM 2024.10.01. Now: Android Gradle Plugin 9.5.0 with built-in Kotlin, Kotlin 2.4.21, Gradle 9.6.0, API 37, CameraX 1.7.0, Compose BOM 2026.11.01. Why: the installed Android Studio and SDK are newer, and the project's author runs the latest Android. Some points are not verified until Task 1 builds; see the plan's `Revisions`. No ADR changes: [ADR 0005](docs/adr/0005-native-android.md) names no versions.
+
 ### Added
 
 - 2026-11-24: [Android machine setup guide](docs/android-setup.md) for a first-time Android developer on Ubuntu: JDK 17, Android Studio, SDK, Gradle, emulator or real phone, checks and troubleshooting. Linked from `README.md`; it is the prerequisite for the [shoot-one-Roll plan](docs/plans/2026-11-24-shoot-one-roll.md).

@@ -8,7 +8,7 @@
 |---|---|
 | **JDK** | Java Development Kit. Gradle and the Android tools run on Java, even though Cineroll is written in Kotlin. This project needs **JDK 17**. |
 | **Android Studio** | The official editor (IDE) for Android. It also installs and manages the other tools below. |
-| **Android SDK** | A folder of tools and libraries: one "platform" per Android version (API 35 = Android 15), build tools, and the emulator. |
+| **Android SDK** | A folder of tools and libraries: one "platform" per Android version (each Android version has an API number; API 37 is the newest one at the time of writing), build tools, and the emulator. |
 | **Gradle** | The build tool. It downloads libraries, compiles the code and runs tests. The project calls it through `./gradlew` (the "wrapper"), which fetches the right Gradle version by itself. |
 | **adb** | Android Debug Bridge. A command-line tool that talks to a phone or emulator: install apps, read logs, list devices. |
 | **Emulator / AVD** | A virtual phone running on your computer. An AVD (Android Virtual Device) is one saved virtual phone. |
@@ -63,11 +63,11 @@ Use Google's own download, not a repackaged one. (The `android-studio` snap on t
 
 In Android Studio: **More Actions (or the gear icon) > SDK Manager**.
 
-- **SDK Platforms** tab: tick **Android 15.0 (API 35)**.
+- **SDK Platforms** tab: tick **Android API 37** (the setup wizard usually installs it already).
 - **SDK Tools** tab: tick **Android SDK Build-Tools**, **Android SDK Command-line Tools (latest)**, **Android SDK Platform-Tools** and **Android Emulator**.
 - Press **Apply** and wait for the downloads.
 
-The project builds against API 35 and runs on Android 10 (API 29) and newer.
+The project builds against API 37 and runs on Android 10 (API 29) and newer.
 
 ### 4. Tell your shell where the SDK is
 
@@ -97,18 +97,18 @@ curl -s "https://get.sdkman.io" | bash
 Open a new terminal, then:
 
 ```bash
-sdk install gradle 8.9
+sdk install gradle 9.6.0
 gradle --version
 ```
 
-Expected: `Gradle 8.9`. After Task 1 commits the wrapper, you will use `./gradlew` and can ignore this Gradle.
+Expected: `Gradle 9.6.0`. After Task 1 commits the wrapper, you will use `./gradlew` and can ignore this Gradle.
 
 ### 6. Create a virtual phone (emulator)
 
 In Android Studio: **More Actions > Virtual Device Manager > Create Device**.
 
 1. Pick a Pixel phone profile and press **Next**.
-2. Pick the system image **API 35**, type **Google APIs**, architecture **x86_64** (download it if asked) and press **Next**.
+2. Pick the system image **API 37**, type **Google APIs**, architecture **x86_64** (download it if asked) and press **Next**.
 3. Press **Show Advanced Settings** and set **Back camera** to **VirtualScene**. Cineroll needs a back camera, and this gives the emulator a fake 3D room to point at. (Move the view with Alt and the mouse.)
 4. **Finish**, then press the play button next to the device.
 
@@ -150,7 +150,7 @@ echo "sdk.dir=$HOME/Android/Sdk" > local.properties
 ```bash
 java -version      # openjdk 17
 adb version        # Android Debug Bridge
-gradle --version   # Gradle 8.9
+gradle --version   # Gradle 9.6.0
 adb devices        # your emulator or phone listed as "device"
 ```
 

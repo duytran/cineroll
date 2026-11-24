@@ -6,11 +6,11 @@
 
 **Architecture:** Pure Kotlin domain (`Film`, `Roll`) and a `Shutter` that runs capture → develop → save → charge the Roll, with the platform pieces (CameraX, GPU, MediaStore, SharedPreferences) behind small interfaces so the flow is unit-testable with fakes. The Film is data; a GLES 3.0 shader applies it after capture. Spec: [`docs/specs/2026-11-24-shoot-one-roll-design.md`](../specs/2026-11-24-shoot-one-roll-design.md).
 
-**Tech Stack:** Kotlin 2.0.21, Android Gradle Plugin 8.7.3, Gradle 8.9, JDK 17, CameraX 1.4.1, Jetpack Compose (BOM 2024.10.01), kotlinx-coroutines 1.9.0, OpenGL ES 3.0 via `EGL14`, JUnit 4.
+**Tech Stack:** Kotlin 2.4.21, Android Gradle Plugin 9.5.0 (built-in Kotlin), Gradle 9.6.0, JDK 17, compileSdk and targetSdk 37, CameraX 1.7.0, Jetpack Compose (BOM 2026.11.01), kotlinx-coroutines 1.11.0, OpenGL ES 3.0 via `EGL14`, JUnit 4. Versions looked up on 2026-11-24; see `Revisions` at the bottom.
 
 ## Prerequisites (not a task)
 
-This machine had no JDK, Gradle, Android SDK or `adb` when the plan was written. Before Task 1, install JDK 17 and Android Studio (or the command-line SDK) with platform 35, and have an emulator (with a virtual back camera) or a Pixel connected. Create `local.properties` with `sdk.dir=...` (it is git-ignored). Tasks 2, 3, 5 and 6 run instrumented tests and need that emulator or device.
+This machine had no JDK, Gradle, Android SDK or `adb` when the plan was written. Before Task 1, install JDK 17 and Android Studio (or the command-line SDK) with platform API 37, and have an emulator (with a virtual back camera) or a Pixel connected. Create `local.properties` with `sdk.dir=...` (it is git-ignored). Tasks 2, 3, 5 and 6 run instrumented tests and need that emulator or device.
 
 ## Global Constraints
 
@@ -100,9 +100,8 @@ include(":app")
 
 ```kotlin
 plugins {
-    id("com.android.application") version "8.7.3" apply false
-    id("org.jetbrains.kotlin.android") version "2.0.21" apply false
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21" apply false
+    id("com.android.application") version "9.5.0" apply false
+    id("org.jetbrains.kotlin.plugin.compose") version "2.4.21" apply false
 }
 ```
 
@@ -119,18 +118,17 @@ kotlin.code.style=official
 ```kotlin
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
     namespace = "app.cineroll"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "app.cineroll"
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 37
         versionCode = 1
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -142,32 +140,31 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
 }
 
 dependencies {
-    implementation(platform("androidx.compose:compose-bom:2024.10.01"))
+    implementation(platform("androidx.compose:compose-bom:2026.11.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.activity:activity-compose:1.9.3")
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation("androidx.activity:activity-compose:1.13.0")
+    implementation("androidx.core:core-ktx:1.19.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
 
-    val cameraX = "1.4.1"
+    val cameraX = "1.7.0"
     implementation("androidx.camera:camera-core:$cameraX")
     implementation("androidx.camera:camera-camera2:$cameraX")
     implementation("androidx.camera:camera-lifecycle:$cameraX")
     implementation("androidx.camera:camera-view:$cameraX")
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
 
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.10.01"))
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test:runner:1.6.2")
-    androidTestImplementation("androidx.test:rules:1.6.1")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2026.11.01"))
+    androidTestImplementation("androidx.test.ext:junit:1.3.0")
+    androidTestImplementation("androidx.test:runner:1.7.0")
+    androidTestImplementation("androidx.test:rules:1.7.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
@@ -203,10 +200,10 @@ captures/
 
 - [ ] **Step 2: Generate the Gradle wrapper and check the build runs**
 
-Run (needs Gradle installed once, for example with SDKMAN `sdk install gradle 8.9`; or open the folder in Android Studio and let it create the wrapper):
+Run (needs Gradle installed once, for example with SDKMAN `sdk install gradle 9.6.0`; or open the folder in Android Studio and let it create the wrapper):
 
 ```bash
-gradle wrapper --gradle-version 8.9
+gradle wrapper --gradle-version 9.6.0
 ./gradlew :app:testDebugUnitTest
 ```
 
@@ -1814,7 +1811,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -1822,6 +1818,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import app.cineroll.platform.CameraXCapturer
 
 @Composable
@@ -2012,3 +2009,8 @@ First slice built: shoot one Roll of 36 Exposures on a 35mm Camera with one Film
 git add app README.md CHANGELOG.md
 git commit -m "feat: add the viewfinder and Roll screens"
 ```
+
+## Revisions
+
+- 2026-11-24: Moved the whole build stack from the versions first written (Kotlin 2.0.21, Android Gradle Plugin 8.7.3, Gradle 8.9, compileSdk and targetSdk 35, CameraX 1.4.1, Compose BOM 2024.10.01, coroutines 1.9.0, activity-compose 1.9.3, lifecycle 2.8.7, core-ktx 1.15.0, androidx.test 1.2.1 / 1.6.2 / 1.6.1) to the current stable versions in the Tech Stack line and Task 1, because the machine's Android Studio and SDK (API 37) are newer and the author is on the latest Android. Two code changes came with it: the `org.jetbrains.kotlin.android` plugin and `kotlinOptions` are gone (Android Gradle Plugin 9 has built-in Kotlin), and `LocalLifecycleOwner` is imported from `androidx.lifecycle.compose`.
+- 2026-11-24: **Not yet verified on a real build.** The versions were read from developer.android.com, kotlinlang.org, gradle.org and GitHub on this date, but these points were not confirmed and Task 1's first build may need fixes: (1) which Kotlin version Android Gradle Plugin 9.5.0 bundles, and so which version the Compose compiler plugin must have (if Gradle reports a mismatch, use the version it names); (2) whether Gradle 9.6.0 is the right wrapper version (the plugin's notes give it as the minimum and default); (3) whether `targetSdk = 37` changes any behaviour this app relies on (camera, gallery saves); (4) the Compose BOM mapping of 2026.11.01 to library versions was inferred from the page order. Whoever runs Task 1 fixes these against the real build output and records what changed here.
