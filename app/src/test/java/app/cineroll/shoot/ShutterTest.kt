@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -75,8 +76,10 @@ class ShutterTest {
     private val gallery = FakeGallery()
     private val store = FakeStore()
 
-    private fun TestScope.shutter(roll: Roll = Roll.new(Films.Everyday400)) =
+    private fun TestScope.shutter(roll: Roll? = Roll.new(Films.Everyday400)) =
         Shutter(capturer, developer, gallery, store, roll, work = UnconfinedTestDispatcher(testScheduler))
+
+    private val Shutter.current: Roll get() = roll.value!!
 
     @Test
     fun successSavesTheDevelopedExposureAndChargesTheRollOnce() = runTest {
@@ -86,7 +89,7 @@ class ShutterTest {
 
         assertEquals(1, gallery.saved.size)
         assertArrayEquals(byteArrayOf(9, 9), gallery.saved.single())
-        assertEquals(1, shutter.roll.value.used)
+        assertEquals(1, shutter.current.used)
         assertEquals(1, store.saved.single().used)
         assertFalse(shutter.busy.value)
     }
@@ -98,7 +101,7 @@ class ShutterTest {
 
         assertEquals(ShootResult.CaptureFailed, shutter.shoot())
 
-        assertEquals(0, shutter.roll.value.used)
+        assertEquals(0, shutter.current.used)
         assertTrue(gallery.saved.isEmpty())
         assertTrue(store.saved.isEmpty())
         assertFalse(shutter.busy.value)
@@ -111,7 +114,7 @@ class ShutterTest {
 
         assertEquals(ShootResult.DevelopFailed, shutter.shoot())
 
-        assertEquals(0, shutter.roll.value.used)
+        assertEquals(0, shutter.current.used)
         assertTrue(gallery.saved.isEmpty())
         assertTrue(store.saved.isEmpty())
         assertFalse(shutter.busy.value)
@@ -124,7 +127,7 @@ class ShutterTest {
 
         assertEquals(ShootResult.SaveFailed, shutter.shoot())
 
-        assertEquals(0, shutter.roll.value.used)
+        assertEquals(0, shutter.current.used)
         assertTrue(store.saved.isEmpty())
         assertFalse(shutter.busy.value)
     }
@@ -141,7 +144,7 @@ class ShutterTest {
         assertEquals(ShootResult.Developed, shutter.shoot())
         assertEquals(ShootResult.Developed, shutter.shoot())
 
-        assertEquals(2, shutter.roll.value.used)
+        assertEquals(2, shutter.current.used)
         assertEquals(2, gallery.saved.size)
         assertEquals(2, logged.size)
     }
@@ -161,7 +164,7 @@ class ShutterTest {
 
         gate.complete(Unit)
         assertEquals(ShootResult.Developed, first.await())
-        assertEquals(1, shutter.roll.value.used)
+        assertEquals(1, shutter.current.used)
     }
 
     @Test
@@ -169,7 +172,7 @@ class ShutterTest {
         val shutter = shutter(Roll(Films.Everyday400, Format.MM35, used = 35))
 
         assertEquals(ShootResult.Developed, shutter.shoot())
-        assertTrue(shutter.roll.value.isFinished)
+        assertTrue(shutter.current.isFinished)
 
         val callsBefore = capturer.calls
         assertEquals(ShootResult.RollFinished, shutter.shoot())
@@ -177,22 +180,147 @@ class ShutterTest {
     }
 
     @Test
-    fun loadNewRollReplacesAFinishedRollAndSavesIt() = runTest {
-        val shutter = shutter(Roll(Films.Everyday400, Format.MM35, used = 36))
+    fun shootingWithNoRollDoesNothing() = runTest {
+        val shutter = shutter(null)
 
-        shutter.loadNewRoll()
+        assertEquals(ShootResult.NoRoll, shutter.shoot())
 
-        assertEquals(0, shutter.roll.value.used)
-        assertEquals(0, store.saved.single().used)
+        assertEquals(0, capturer.calls)
+        assertTrue(gallery.saved.isEmpty())
+        assertTrue(store.saved.isEmpty())
+        assertFalse(shutter.busy.value)
     }
 
     @Test
-    fun loadNewRollDoesNothingWhileARollIsLoaded() = runTest {
+    fun loadMakesANewRollWithThatFilmAndSavesIt() = runTest {
+        val shutter = shutter(null)
+
+        shutter.load(Films.Mono400)
+
+        assertEquals(Roll.new(Films.Mono400), shutter.roll.value)
+        assertEquals(Roll.new(Films.Mono400), store.saved.single())
+    }
+
+    @Test
+    fun loadDoesNothingWhileARollExists() = runTest {
         val shutter = shutter(Roll(Films.Everyday400, Format.MM35, used = 5))
 
-        shutter.loadNewRoll()
+        shutter.load(Films.Mono400)
 
-        assertEquals(5, shutter.roll.value.used)
+        assertEquals(Films.Everyday400, shutter.current.film)
+        assertEquals(5, shutter.current.used)
         assertTrue(store.saved.isEmpty())
+    }
+
+    @Test
+    fun loadStillPublishesTheRollWhenTheStoreFails() = runTest {
+        store.failure = IOException("disk")
+        val logged = mutableListOf<String>()
+        val shutter = Shutter(
+            capturer, developer, gallery, store, null,
+            work = UnconfinedTestDispatcher(testScheduler), log = { message, _ -> logged += message },
+        )
+
+        shutter.load(Films.Faded800)
+
+        assertEquals(Roll.new(Films.Faded800), shutter.roll.value)
+        assertEquals(1, logged.size)
+    }
+
+    @Test
+    fun rewindFinishesTheRollKeepsTheCountAndSavesIt() = runTest {
+        val shutter = shutter(Roll(Films.Everyday400, Format.MM35, used = 13))
+
+        assertTrue(shutter.rewind())
+
+        assertTrue(shutter.current.isFinished)
+        assertEquals(13, shutter.current.used)
+        assertTrue(store.saved.single().ended)
+        assertTrue(gallery.saved.isEmpty())
+    }
+
+    @Test
+    fun afterARewindNoMoreExposuresCanBeShot() = runTest {
+        val shutter = shutter()
+        shutter.rewind()
+
+        assertEquals(ShootResult.RollFinished, shutter.shoot())
+
+        assertEquals(0, capturer.calls)
+    }
+
+    @Test
+    fun rewindIsRefusedWhileDeveloping() = runTest {
+        val gate = CompletableDeferred<Unit>()
+        capturer.gate = gate
+        val shutter = shutter()
+
+        val first = async { shutter.shoot() }
+        runCurrent()
+        assertTrue(shutter.busy.value)
+
+        assertFalse(shutter.rewind())
+        assertFalse(shutter.current.isFinished)
+
+        gate.complete(Unit)
+        assertEquals(ShootResult.Developed, first.await())
+        assertEquals(1, shutter.current.used)
+    }
+
+    @Test
+    fun rewindIsRefusedWithNoRollAndOnAFinishedRoll() = runTest {
+        assertFalse(shutter(null).rewind())
+        assertFalse(shutter(Roll(Films.Everyday400, Format.MM35, used = 36)).rewind())
+        assertTrue(store.saved.isEmpty())
+    }
+
+    @Test
+    fun rewindStillFinishesTheRollWhenTheStoreFails() = runTest {
+        store.failure = IOException("disk")
+        val logged = mutableListOf<String>()
+        val shutter = Shutter(
+            capturer, developer, gallery, store, Roll.new(Films.Everyday400),
+            work = UnconfinedTestDispatcher(testScheduler), log = { message, _ -> logged += message },
+        )
+
+        assertTrue(shutter.rewind())
+
+        assertTrue(shutter.current.isFinished)
+        assertEquals(1, logged.size)
+    }
+
+    @Test
+    fun clearDropsAFinishedRollAndClearsTheStore() = runTest {
+        val shutter = shutter(Roll(Films.Everyday400, Format.MM35, used = 36))
+
+        shutter.clear()
+
+        assertNull(shutter.roll.value)
+        assertEquals(1, store.cleared)
+    }
+
+    @Test
+    fun clearDoesNothingWhileARollIsLoaded() = runTest {
+        val shutter = shutter(Roll(Films.Everyday400, Format.MM35, used = 5))
+
+        shutter.clear()
+
+        assertEquals(5, shutter.current.used)
+        assertEquals(0, store.cleared)
+    }
+
+    @Test
+    fun clearStillShowsThePickerWhenTheStoreFails() = runTest {
+        store.failure = IOException("disk")
+        val logged = mutableListOf<String>()
+        val shutter = Shutter(
+            capturer, developer, gallery, store, Roll(Films.Everyday400, Format.MM35, used = 36),
+            work = UnconfinedTestDispatcher(testScheduler), log = { message, _ -> logged += message },
+        )
+
+        shutter.clear()
+
+        assertNull(shutter.roll.value)
+        assertEquals(1, logged.size)
     }
 }

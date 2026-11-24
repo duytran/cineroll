@@ -3,7 +3,7 @@ package app.cineroll.shoot
 import app.cineroll.develop.CapturedImage
 import app.cineroll.develop.DevelopException
 import app.cineroll.develop.Developer
-import app.cineroll.film.Films
+import app.cineroll.film.Film
 import app.cineroll.roll.Roll
 import app.cineroll.roll.RollStore
 import java.io.IOException
@@ -30,23 +30,26 @@ class CaptureException(message: String, cause: Throwable? = null) : Exception(me
 
 class GalleryException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
-enum class ShootResult { Developed, Busy, RollFinished, CaptureFailed, DevelopFailed, SaveFailed }
+enum class ShootResult { Developed, Busy, NoRoll, RollFinished, CaptureFailed, DevelopFailed, SaveFailed }
 
 /**
  * The shoot flow: capture, develop, save, then charge the Roll. The Roll is charged only after the
  * save succeeds, so a failure never costs an Exposure.
+ *
+ * [roll] is `null` while no Roll is loaded (first launch, or after a Finished Roll was cleared);
+ * the app then shows the Film picker.
  */
 class Shutter(
     private val capturer: Capturer,
     private val developer: Developer,
     private val gallery: Gallery,
     private val store: RollStore,
-    initialRoll: Roll,
+    initialRoll: Roll?,
     private val work: CoroutineDispatcher = Dispatchers.Default,
     private val log: (String, Throwable) -> Unit = { _, _ -> },
 ) {
     private val _roll = MutableStateFlow(initialRoll)
-    val roll: StateFlow<Roll> = _roll
+    val roll: StateFlow<Roll?> = _roll
 
     private val _busy = MutableStateFlow(false)
     val busy: StateFlow<Boolean> = _busy
@@ -54,7 +57,7 @@ class Shutter(
     private val taking = AtomicBoolean(false)
 
     suspend fun shoot(): ShootResult {
-        val current = _roll.value
+        val current = _roll.value ?: return ShootResult.NoRoll
         if (current.isFinished) return ShootResult.RollFinished
         if (!taking.compareAndSet(false, true)) return ShootResult.Busy
         _busy.value = true
@@ -90,12 +93,38 @@ class Shutter(
         }
     }
 
-    /** Loads a fresh Roll, but only when the current one is finished. */
-    fun loadNewRoll() {
-        if (!_roll.value.isFinished) return
-        val fresh = Roll.new(Films.Everyday400)
+    /** Loads a new 35mm Roll with [film], but only while no Roll is loaded. */
+    fun load(film: Film) {
+        if (_roll.value != null) return
+        val fresh = Roll.new(film)
         _roll.value = fresh
         saveRoll(fresh)
+    }
+
+    /**
+     * Ends the loaded Roll early. The unused Exposures are lost.
+     * @return `true` if the Roll was rewound; `false` if there is no Roll, it is already finished,
+     * or an Exposure is being developed.
+     */
+    fun rewind(): Boolean {
+        val current = _roll.value ?: return false
+        if (current.isFinished || taking.get()) return false
+        val ended = current.rewind()
+        _roll.value = ended
+        saveRoll(ended)
+        return true
+    }
+
+    /** Drops the Finished Roll so the Film picker shows. Does nothing while a Roll is loaded. */
+    fun clear() {
+        val current = _roll.value ?: return
+        if (!current.isFinished) return
+        _roll.value = null
+        try {
+            store.clear()
+        } catch (e: IOException) {
+            log("Could not clear the Roll", e)
+        }
     }
 
     private fun saveRoll(roll: Roll) {

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -32,6 +33,11 @@ class ShootSmokeTest {
     /** Leaves one developed Exposure in DCIM/Cineroll on the test device. */
     @Test
     fun shootingOneExposureMovesTheCounterFrom36To35() {
+        compose.waitUntil(15_000) {
+            compose.onAllNodesWithTag("film-Everyday 400").fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithTag("film-Everyday 400").performClick()
+
         compose.waitUntil(15_000) {
             compose.onAllNodesWithText("36/36").fetchSemanticsNodes().isNotEmpty()
         }

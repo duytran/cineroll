@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -43,6 +45,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import app.cineroll.film.Film
+import app.cineroll.film.Films
 import app.cineroll.platform.CameraXCapturer
 
 @Composable
@@ -57,6 +61,7 @@ fun CineRollApp(viewModel: ShootViewModel) {
     }
 
     val roll by viewModel.shutter.roll.collectAsState()
+    val current = roll
     when {
         !granted -> PermissionScreen(
             onAllow = { askForCamera.launch(Manifest.permission.CAMERA) },
@@ -66,7 +71,8 @@ fun CineRollApp(viewModel: ShootViewModel) {
                 )
             },
         )
-        roll.isFinished -> FinishedRollScreen(onLoadNewRoll = viewModel.shutter::loadNewRoll)
+        current == null -> FilmPickerScreen(onPick = viewModel::load)
+        current.isFinished -> FinishedRollScreen(onLoadNewRoll = viewModel::clear)
         else -> ViewfinderScreen(viewModel)
     }
 }
@@ -88,6 +94,27 @@ private fun PermissionScreen(onAllow: () -> Unit, onOpenSettings: () -> Unit) {
 }
 
 @Composable
+private fun FilmPickerScreen(onPick: (Film) -> Unit) {
+    Column(
+        Modifier.fillMaxSize().padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text("Load a Film", style = MaterialTheme.typography.headlineSmall)
+        Films.all.forEach { film ->
+            Button(
+                onClick = { onPick(film) },
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp).testTag("film-${film.name}"),
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(film.name)
+                    Text(film.description, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun FinishedRollScreen(onLoadNewRoll: () -> Unit) {
     Column(
         Modifier.fillMaxSize().padding(32.dp),
@@ -103,7 +130,7 @@ private fun FinishedRollScreen(onLoadNewRoll: () -> Unit) {
 private fun ViewfinderScreen(viewModel: ShootViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val roll by viewModel.shutter.roll.collectAsState()
+    val roll = viewModel.shutter.roll.collectAsState().value ?: return
     val busy by viewModel.shutter.busy.collectAsState()
     val message by viewModel.message.collectAsState()
     val snackbar = remember { SnackbarHostState() }
