@@ -27,7 +27,7 @@ Slice 1 is merged to `main` and builds. Tasks 2, 3 and 4 run instrumented tests 
 - Use [`GLOSSARY.md`](../../GLOSSARY.md) terms in code and docs (Film, Roll, Exposure, Finished Roll, Rewind). Avoid the words it lists under _Avoid_ in code names (no "filter", "preset", "session").
 - Every task adds one entry under `## [Unreleased]` in `CHANGELOG.md` (date = the day the task is done, `YYYY-MM-DD`; the examples below use 2026-11-24) and commits it with the code.
 - **Never** add a `Co-Authored-By:` line or any attribution trailer to a commit message.
-- Per [ADR 0003](../adr/0003-issue-and-pr-per-task.md): before writing code, ask the user once, then open one GitHub issue per task (`Task N: <name>`), build each task on its own branch `task/<issue>-<slug>` (stacked on the previous task's branch), and merge it through its own PR with `Closes #<issue>`. Write the issue number next to each task heading below, e.g. `### Task 1: … (#13)`.
+- Per [ADR 0003](../adr/0003-issue-and-pr-per-task.md): before writing code, ask the user once, then open one GitHub issue per task (`Task N: <name>`), build each task on its own branch `task/<issue>-<slug>` (stacked on the previous task's branch), and merge it through its own PR with `Closes #<issue>`. The issue numbers are written next to each task heading below (#13 to #16).
 - Run commands from the repository root. Run one instrumented test class with `./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=<fully.qualified.TestClass>` (Android Gradle Plugin 9.5.0 has no `--tests` for instrumented tests; unit tests do).
 
 ## File Structure
@@ -49,7 +49,7 @@ app/src/androidTest/java/app/cineroll/
 
 ---
 
-### Task 1: Four built-in Films
+### Task 1: Four built-in Films (#13)
 
 **Files:**
 - Modify: `app/src/main/java/app/cineroll/film/Film.kt`
@@ -297,7 +297,7 @@ git commit -m "feat: add Daylight 100, Faded 800 and Mono 400 Films"
 
 ---
 
-### Task 2: Rewind on the Roll, and the store keeps it
+### Task 2: Rewind on the Roll, and the store keeps it (#14)
 
 **Files:**
 - Modify: `app/src/main/java/app/cineroll/roll/Roll.kt`
@@ -515,7 +515,7 @@ git commit -m "feat: add Rewind to Roll and RollStore"
 
 ---
 
-### Task 3: `Shutter` without a default Roll, and the Film picker
+### Task 3: `Shutter` without a default Roll, and the Film picker (#15)
 
 **Files:**
 - Modify: `app/src/main/java/app/cineroll/shoot/Shutter.kt`
@@ -1004,7 +1004,7 @@ git commit -m "feat: add the Film picker and a Shutter that can have no Roll"
 
 ---
 
-### Task 4: Rewind button, confirm dialog and the Film name in the viewfinder
+### Task 4: Rewind button, confirm dialog and the Film name in the viewfinder (#16)
 
 **Files:**
 - Modify: `app/src/main/java/app/cineroll/ui/Screens.kt`
