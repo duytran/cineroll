@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cineroll.film.Films
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -39,6 +40,36 @@ class PrefsRollStoreTest {
         val finished = Roll(Films.Everyday400, Format.MM35, used = 36)
         PrefsRollStore(context).save(finished)
         assertTrue(PrefsRollStore(context).load()!!.isFinished)
+    }
+
+    @Test
+    fun aRewoundRollStaysEnded() {
+        val rewound = Roll.new(Films.Everyday400).expose().rewind()
+        PrefsRollStore(context).save(rewound)
+
+        val loaded = PrefsRollStore(context).load()!!
+        assertEquals(rewound, loaded)
+        assertTrue(loaded.ended)
+        assertEquals(1, loaded.used)
+    }
+
+    @Test
+    fun aRollSavedBySlice1WithoutEndedLoadsAsNotEnded() {
+        prefs.edit().putString("film", "Everyday 400").putString("format", "MM35").putInt("used", 4).commit()
+
+        val loaded = PrefsRollStore(context).load()!!
+        assertFalse(loaded.ended)
+        assertEquals(4, loaded.used)
+    }
+
+    @Test
+    fun clearRemovesTheSavedRoll() {
+        val store = PrefsRollStore(context)
+        store.save(Roll.new(Films.Everyday400))
+
+        store.clear()
+
+        assertNull(PrefsRollStore(context).load())
     }
 
     @Test

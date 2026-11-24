@@ -43,6 +43,34 @@ class RollTest {
     }
 
     @Test
+    fun aNewRollIsNotEnded() {
+        assertFalse(Roll.new(Films.Everyday400).ended)
+    }
+
+    @Test
+    fun rewindFinishesTheRollAndKeepsTheCount() {
+        val rewound = Roll.new(Films.Everyday400).expose().expose().rewind()
+
+        assertTrue(rewound.ended)
+        assertTrue(rewound.isFinished)
+        assertEquals(2, rewound.used)
+    }
+
+    @Test
+    fun rewindOnAFinishedRollThrows() {
+        val used = Roll(Films.Everyday400, Format.MM35, used = 36)
+        val ended = Roll.new(Films.Everyday400).rewind()
+        assertThrows(IllegalStateException::class.java) { used.rewind() }
+        assertThrows(IllegalStateException::class.java) { ended.rewind() }
+    }
+
+    @Test
+    fun exposeAfterRewindThrows() {
+        val rewound = Roll.new(Films.Everyday400).expose().rewind()
+        assertThrows(IllegalStateException::class.java) { rewound.expose() }
+    }
+
+    @Test
     fun rejectsUsedCountOutsideTheRoll() {
         assertThrows(IllegalArgumentException::class.java) { Roll(Films.Everyday400, Format.MM35, used = 37) }
         assertThrows(IllegalArgumentException::class.java) { Roll(Films.Everyday400, Format.MM35, used = -1) }

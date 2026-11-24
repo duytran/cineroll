@@ -11,6 +11,9 @@ interface RollStore {
 
     /** @throws IOException if the Roll could not be written. */
     fun save(roll: Roll)
+
+    /** Removes the saved Roll, so [load] returns `null`. @throws IOException if it could not be removed. */
+    fun clear()
 }
 
 class PrefsRollStore(context: Context) : RollStore {
@@ -23,7 +26,9 @@ class PrefsRollStore(context: Context) : RollStore {
             ?.let { name -> Format.entries.firstOrNull { it.name == name } } ?: return null
         val used = prefs.getInt("used", -1)
         if (used !in 0..format.exposures) return null
-        return Roll(film, format, used)
+        // A Roll saved before Rewind existed has no "ended" value: it was never rewound.
+        val ended = prefs.getBoolean("ended", false)
+        return Roll(film, format, used, ended)
     }
 
     override fun save(roll: Roll) {
@@ -31,7 +36,12 @@ class PrefsRollStore(context: Context) : RollStore {
             .putString("film", roll.film.name)
             .putString("format", roll.format.name)
             .putInt("used", roll.used)
+            .putBoolean("ended", roll.ended)
             .commit()
         if (!written) throw IOException("Could not save the Roll")
+    }
+
+    override fun clear() {
+        if (!prefs.edit().clear().commit()) throw IOException("Could not clear the Roll")
     }
 }
