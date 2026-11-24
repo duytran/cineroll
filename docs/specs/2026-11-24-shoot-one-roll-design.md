@@ -70,6 +70,10 @@ Out of scope: retries, a queue of pending Exposures, crash reporting.
 | `RollStore` | Instrumented: save, reload, same count and state; first launch with nothing saved. |
 | `Developer` | Golden image on a device or emulator: a fixed input through the built-in Film matches a stored output within a small tolerance. |
 | `Shutter` | Unit tests with fakes for camera, `Developer`, gallery and `RollStore`: success charges the Roll once; failure at capture, develop or save charges nothing; a failed `RollStore` write after a good save does not block the next shot; two quick taps take one Exposure. |
-| UI | One smoke test: grant permission, tap the shutter, counter goes `0/36` to `1/36`. |
+| UI | One smoke test: grant permission, tap the shutter, counter goes `36/36` to `35/36`. |
 
 CameraX and `MediaStore` themselves are not unit tested.
+
+## Revisions
+
+- 2026-11-24: The UI smoke test said the counter goes `0/36` to `1/36`, which contradicted the assumption that the counter shows Exposures left (`23/36`). Corrected to `36/36` to `35/36`. A new Roll shows `36/36`.
