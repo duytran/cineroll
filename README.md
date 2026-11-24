@@ -12,6 +12,7 @@ Design stage. No app code yet; the domain language and first decisions are writt
 - [`docs/adr/`](docs/adr/) — design decisions.
 - [`docs/specs/`](docs/specs/) — design specs.
 - [`docs/plans/`](docs/plans/) — implementation plans.
+- [`docs/android-setup.md`](docs/android-setup.md) — preparing a machine for Android development.
 - [`CHANGELOG.md`](CHANGELOG.md) — every change, newest first.
 - [`CLAUDE.md`](CLAUDE.md) — working rules for Claude and other agents.
 

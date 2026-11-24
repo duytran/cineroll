@@ -8,6 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- 2026-11-24: [Android machine setup guide](docs/android-setup.md) for a first-time Android developer on Ubuntu: JDK 17, Android Studio, SDK, Gradle, emulator or real phone, checks and troubleshooting. Linked from `README.md`; it is the prerequisite for the [shoot-one-Roll plan](docs/plans/2026-11-24-shoot-one-roll.md).
 - 2026-11-24: Opened GitHub issues [#1](https://github.com/duytran/cineroll/issues/1) to [#6](https://github.com/duytran/cineroll/issues/6), one per task of the [shoot-one-Roll plan](docs/plans/2026-11-24-shoot-one-roll.md), and wrote the issue numbers next to the task headings, as [ADR 0003](docs/adr/0003-issue-and-pr-per-task.md) requires.
 - 2026-11-24: [Plan: shoot one Roll](docs/plans/2026-11-24-shoot-one-roll.md), six tasks from project scaffold to the viewfinder screens. While planning, the [spec](docs/specs/2026-11-24-shoot-one-roll-design.md) was corrected: the UI smoke test said the counter goes `0/36` to `1/36` but the counter shows Exposures left, so it now says `36/36` to `35/36` (see its `Revisions`).
 - 2026-11-24: [Spec: shoot one Roll](docs/specs/2026-11-24-shoot-one-roll-design.md), the first slice (one Camera, one Film, 36 Exposures), with [ADR 0005](docs/adr/0005-native-android.md) (native Android, Kotlin and CameraX) and [ADR 0006](docs/adr/0006-develop-on-the-gpu-after-capture.md) (plain viewfinder, develop on the GPU after capture).
