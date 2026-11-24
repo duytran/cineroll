@@ -6,7 +6,7 @@
 
 **Architecture:** Pure Kotlin domain (`Film`, `Roll`) and a `Shutter` that runs capture → develop → save → charge the Roll, with the platform pieces (CameraX, GPU, MediaStore, SharedPreferences) behind small interfaces so the flow is unit-testable with fakes. The Film is data; a GLES 3.0 shader applies it after capture. Spec: [`docs/specs/2026-11-24-shoot-one-roll-design.md`](../specs/2026-11-24-shoot-one-roll-design.md).
 
-**Tech Stack:** Kotlin 2.4.21, Android Gradle Plugin 9.5.0 (built-in Kotlin), Gradle 9.6.0, JDK 17, compileSdk and targetSdk 37, CameraX 1.7.0, Jetpack Compose (BOM 2026.11.01), kotlinx-coroutines 1.11.0, OpenGL ES 3.0 via `EGL14`, JUnit 4. Versions looked up on 2026-11-24; see `Revisions` at the bottom.
+**Tech Stack:** Kotlin 2.4.21, Android Gradle Plugin 9.5.0 (built-in Kotlin), Gradle 9.6.0, JDK 17, compileSdk and targetSdk 37, CameraX 1.7.0, Jetpack Compose (BOM 2026.09.00), kotlinx-coroutines 1.11.0, OpenGL ES 3.0 via `EGL14`, JUnit 4. Versions looked up on 2026-11-24; see `Revisions` at the bottom.
 
 ## Prerequisites (not a task)
 
@@ -143,7 +143,7 @@ android {
 }
 
 dependencies {
-    implementation(platform("androidx.compose:compose-bom:2026.11.01"))
+    implementation(platform("androidx.compose:compose-bom:2026.09.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.activity:activity-compose:1.13.0")
@@ -161,7 +161,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
 
-    androidTestImplementation(platform("androidx.compose:compose-bom:2026.11.01"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2026.09.00"))
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test:runner:1.7.0")
     androidTestImplementation("androidx.test:rules:1.7.0")
@@ -2014,3 +2014,4 @@ git commit -m "feat: add the viewfinder and Roll screens"
 
 - 2026-11-24: Moved the whole build stack from the versions first written (Kotlin 2.0.21, Android Gradle Plugin 8.7.3, Gradle 8.9, compileSdk and targetSdk 35, CameraX 1.4.1, Compose BOM 2024.10.01, coroutines 1.9.0, activity-compose 1.9.3, lifecycle 2.8.7, core-ktx 1.15.0, androidx.test 1.2.1 / 1.6.2 / 1.6.1) to the current stable versions in the Tech Stack line and Task 1, because the machine's Android Studio and SDK (API 37) are newer and the author is on the latest Android. Two code changes came with it: the `org.jetbrains.kotlin.android` plugin and `kotlinOptions` are gone (Android Gradle Plugin 9 has built-in Kotlin), and `LocalLifecycleOwner` is imported from `androidx.lifecycle.compose`.
 - 2026-11-24: **Not yet verified on a real build.** The versions were read from developer.android.com, kotlinlang.org, gradle.org and GitHub on this date, but these points were not confirmed and Task 1's first build may need fixes: (1) which Kotlin version Android Gradle Plugin 9.5.0 bundles, and so which version the Compose compiler plugin must have (if Gradle reports a mismatch, use the version it names); (2) whether Gradle 9.6.0 is the right wrapper version (the plugin's notes give it as the minimum and default); (3) whether `targetSdk = 37` changes any behaviour this app relies on (camera, gallery saves); (4) the Compose BOM mapping of 2026.11.01 to library versions was inferred from the page order. Whoever runs Task 1 fixes these against the real build output and records what changed here.
+- 2026-11-24: Task 1 built and its 13 unit tests pass. Result of the four unverified points: (1) the Compose compiler plugin `org.jetbrains.kotlin.plugin.compose` 2.4.21 resolved and compiled with no mismatch error, so no change; (2) wrapper 9.6.0 worked, no change; (3) `targetSdk = 37` built without complaint, but its runtime behaviour for the camera and gallery saves is still untested until Tasks 5 and 6; (4) **changed**: Compose BOM `2026.11.01` maps to Compose 1.13.0, which requires `compileSdk` 37.1 or later, and this machine has only platform `android-37.0` (the build failed in `checkDebugAarMetadata`). The BOM is now `2026.09.00` (Compose 1.12.1) in the Tech Stack line and in both BOM lines of Task 1's `app/build.gradle.kts`, because that needs no new SDK platform. The other option is to install platform `android-37.1` with `sdkmanager` and set `compileSdk = 37` to `release(37) { minorApiLevel = 1 }`; this was not tried. Revisit when the SDK platform is updated.
