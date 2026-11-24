@@ -57,7 +57,7 @@ app/src/androidTest/java/app/cineroll/...  instrumented tests
 
 ---
 
-### Task 1: Project scaffold, `Film` and `Roll`
+### Task 1: Project scaffold, `Film` and `Roll` (#1)
 
 **Files:**
 - Create: `settings.gradle.kts`, `build.gradle.kts`, `gradle.properties`, `app/build.gradle.kts`, `app/src/main/AndroidManifest.xml`
@@ -495,7 +495,7 @@ git commit -m "feat: add Android scaffold with Film and Roll"
 
 ---
 
-### Task 2: `RollStore`
+### Task 2: `RollStore` (#2)
 
 **Files:**
 - Create: `app/src/main/java/app/cineroll/roll/RollStore.kt`
@@ -631,7 +631,7 @@ git commit -m "feat: save and load the loaded Roll"
 
 ---
 
-### Task 3: `Developer` (GPU Film pass)
+### Task 3: `Developer` (GPU Film pass) (#3)
 
 **Files:**
 - Create: `app/src/main/java/app/cineroll/develop/Developer.kt`, `app/src/main/java/app/cineroll/develop/GpuDeveloper.kt`, `app/src/main/java/app/cineroll/develop/FilmRenderer.kt`
@@ -1074,7 +1074,7 @@ git commit -m "feat: develop Exposures on the GPU"
 
 ---
 
-### Task 4: `Shutter`
+### Task 4: `Shutter` (#4)
 
 **Files:**
 - Create: `app/src/main/java/app/cineroll/shoot/Shutter.kt`
@@ -1429,7 +1429,7 @@ git commit -m "feat: add the Shutter shoot flow"
 
 ---
 
-### Task 5: Platform adapters and wiring
+### Task 5: Platform adapters and wiring (#5)
 
 **Files:**
 - Create: `app/src/main/java/app/cineroll/platform/MediaStoreGallery.kt`, `app/src/main/java/app/cineroll/platform/CameraXCapturer.kt`, `app/src/main/java/app/cineroll/ui/ShootViewModel.kt`
@@ -1702,7 +1702,7 @@ git commit -m "feat: add gallery and camera adapters and wire the Shutter"
 
 ---
 
-### Task 6: Screens and smoke test
+### Task 6: Screens and smoke test (#6)
 
 **Files:**
 - Create: `app/src/main/java/app/cineroll/ui/MainActivity.kt`, `app/src/main/java/app/cineroll/ui/Screens.kt`
