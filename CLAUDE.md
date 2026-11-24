@@ -19,6 +19,12 @@ A camera app that makes phone photos look like they were shot on film. You load 
 3. **Keep rules current.** If the change alters how pricing, stock, orders or billing behave, update the matching file in `docs/business-rules/`.
 4. **Commit together.** The docs go in the same commit as the code they describe. A change without its changelog entry is not finished.
 
+## Which model to use
+
+- **Brainstorming** (the `brainstorming` skill, up to the approved spec) runs on **Opus 5.5**.
+- **Writing a plan** (the `writing-plans` skill) runs on **Sonnet 5.5**.
+- If the session's model does not match, ask the user to switch before starting the skill. Details in [ADR-0004](docs/adr/0004-model-per-workflow-phase.md).
+
 ## Never lose the past
 
 - **ADRs state what is true now.** When a decision changes, edit its ADR in place, and write in the `CHANGELOG.md` entry what it said before and why it changed. Git keeps the old text.
